@@ -3,7 +3,6 @@ import datasets.iris.prepareXY as iris
 import datasets.grzybki.prepareXY as grzybki
 import random
 
-
 for dataset in (grzybki, iris):
     (X, Y) = dataset.prepareXY()
     train_idx = random.sample(range(len(Y)), int(0.1 * len(Y)))
