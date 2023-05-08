@@ -1,4 +1,5 @@
 from c45.c45tree import C45Tree
+from random_forest.random_forest import RandomForest
 import datasets.iris.prepareXY as iris
 import datasets.grzybki.prepareXY as grzybki
 import random

@@ -139,3 +139,5 @@ class C45Tree:
         def entropy(y) -> float:
             class_freq = [v / len(y) for v in Counter(y).values()]
             return -sum(v * math.log2(v) for v in class_freq)
+
+
