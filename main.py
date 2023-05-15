@@ -19,6 +19,5 @@ for dataset in (iris, grzybki):
         if (v := c45.predict(x)) == y:
             correct += 1
 
-    print(dataset.__name__)
-    print(correct / len(Y_test))
+    print(f"{dataset.__name__}: {correct / len(Y_test)}")
     #print(c45.get_tree_logic())

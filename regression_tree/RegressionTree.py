@@ -38,7 +38,7 @@ class RegressionTree:
     def __inner_get_tree_logic(self, indent: int, node: 'RegressionTree.Node') -> str:
         ind = " " * indent
         if node.leaf:
-            return f"{ind}return '{node.leaf_value}'"
+            return f"{ind}return {node.leaf_value}"
         discrete = node.threshold is None
         o = f"{ind}if attr[{node.attr}] {'==' if discrete else '<= ' + str(node.threshold)}"
         for i, c in enumerate(node.children):
@@ -81,6 +81,8 @@ class RegressionTree:
 
         def split(self, x, y, attrs) -> Tuple[int, float, SubsetType]:
             _, best_attr = self.standard_deviation_reduction(x, y, attrs)
+            if best_attr is None:
+                breakpoint()
             subsets: RegressionTree.Node.SubsetType = {a: ([], []) for a in self.tree.all_attrs[best_attr]}
             best_threshold = None
 
@@ -125,7 +127,7 @@ class RegressionTree:
 
         def standard_deviation_reduction(self, x, y, attrs) -> Tuple[float, int]:
             sdy, _ = self.standard_deviation(y)
-            max_sdr = 0
+            max_sdr = -np.inf
             best_attr = None
 
             for attr in attrs:

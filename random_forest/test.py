@@ -20,5 +20,4 @@ for dataset in (grzybki, iris):
         if preds[i] == Y_test[i]:
             correct += 1
 
-    print(dataset.__name__)
-    print(correct / len(Y_test))
+    print(f"{dataset.__name__}: {correct / len(Y_test)}")
