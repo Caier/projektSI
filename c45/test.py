@@ -1,25 +1,22 @@
-from c45tree import C45Tree
+from c45.c45tree import C45Tree
+import datasets.iris.prepareXY as iris
+import datasets.grzybki.prepareXY as grzybki
+import random
 
-X = [
-    ["Rainy", "Hot", 34, "False"],
-    ["Rainy", "Hot", 35, "True"],
-    ["Overcast", "Hot", 28, "False"],
-    ["Sunny", "Mild", 27, "False"],
-    ["Sunny", "Cool", 22, "False"],
-    ["Sunny", "Cool", 21, "True"],
-    ["Overcast", "Cool", 23, "True"],
-    ["Rainy", "Mild", 27, "False"],
-    ["Rainy", "Cool", 20, "False"],
-    ["Sunny", "Mild", 23, "False"],
-    ["Rainy", "Mild", 19, "True"],
-    ["Overcast", "Mild", 20, "True"],
-    ["Overcast", "Hot", 22, "False"],
-    ["Sunny", "Mild", 30, "True"]
-]
+for dataset in (iris, grzybki):
+    (X, Y) = dataset.prepareXY()
+    train_idx = random.sample(range(len(Y)), int(0.5 * len(Y)))
+    X_train = [row for i, row in enumerate(X) if i in train_idx]
+    Y_train = [row for i, row in enumerate(Y) if i in train_idx]
+    X_test = [row for i, row in enumerate(X) if i not in train_idx]
+    Y_test = [row for i, row in enumerate(Y) if i not in train_idx]
 
-Y = ["No", "No", "Yes", "Yes", "Yes", "No", "Yes", "No", "Yes", "Yes", "Yes", "Yes", "Yes", "No"]
+    c45 = C45Tree(X_train, Y_train)
 
-c45 = C45Tree(X, Y)
-for x in X:
-    print(c45.predict(x))
-print(c45.get_tree_logic())
+    correct = 0
+    for x, y in zip(X_test, Y_test):
+        if (v := c45.predict(x)) == y:
+            correct += 1
+
+    print(f"{dataset.__name__}: {correct / len(Y_test)}")
+    #print(c45.get_tree_logic())

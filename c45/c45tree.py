@@ -3,9 +3,13 @@ from typing import *
 import math
 import numpy as np
 
+#example call: C45Tree(x, y, max_depth=5, min_sample_split=5)
+#the keyword arguments (hyperparameters) are not required to be set
 class C45Tree:
     #Creates and trains a C4.5 decision tree using X = matrix of attributes, Y = vector of values (classes)
-    def __init__(self, x, y) -> None:
+    def __init__(self, x, y, max_depth = 0xFFFFFFFF, min_sample_split = 1) -> None:
+        self.max_depth = max_depth
+        self.min_sample_split = min_sample_split
         self.x = x
         self.y = y
         self.all_attrs = [set() for _ in range(len(x[0]))]
@@ -16,7 +20,7 @@ class C45Tree:
                 if self.Node.is_discrete(x, i):
                     self.all_attrs[i].add(a)
 
-        self.tree = self.Node(self, x, y, list(range(len(x[0]))))
+        self.tree = self.Node(self, x, y, list(range(len(x[0]))), 0)
 
     def predict(self, x_row):
         node = self.tree
@@ -51,7 +55,7 @@ class C45Tree:
     class Node:
         SubsetType = Dict[Any, Tuple[List[Any], List[List[Any]]]] #in other words: Dict[the attribute value that data was split on, Tuple[Y values for the split, X values for the split]]
 
-        def __init__(self, tree: 'C45Tree', x, y, attrs: List[int], value = None) -> None:
+        def __init__(self, tree: 'C45Tree', x, y, attrs: List[int], depth: int, value = None) -> None:
             self.tree: C45Tree = tree
             self.leaf_value = None #the result of this node if a leaf node, None if failed node
             self.attr_value = value
@@ -64,7 +68,7 @@ class C45Tree:
                 self.leaf_value = self.tree.most_common_class
             elif not any(v != y[0] for v in y): #all values are of same class
                 self.leaf_value = y[0]
-            elif len(attrs) == 0: #no attributes left to decide on
+            elif len(attrs) == 0 or tree.min_sample_split > len(x) or tree.max_depth <= depth: #no attributes left to decide on or not enough samples or too deep
                 self.leaf_value = Counter(y).most_common(1)[0][0]
             else:
                 (best_attr, best_thresh, splits) = self.split(x, y, attrs)
@@ -73,7 +77,7 @@ class C45Tree:
                 self.leaf = False
                 self.attr = best_attr
                 self.threshold = best_thresh
-                self.children = [C45Tree.Node(self.tree, subset[1], subset[0], rest_attrs, split_attr) for split_attr, subset in splits.items()]
+                self.children = [C45Tree.Node(self.tree, subset[1], subset[0], rest_attrs, depth+1, split_attr) for split_attr, subset in splits.items()]
 
         def split(self, x, y, attrs) -> Tuple[int, float, SubsetType]:
             splitted: C45Tree.Node.SubsetType = {}
@@ -139,5 +143,3 @@ class C45Tree:
         def entropy(y) -> float:
             class_freq = [v / len(y) for v in Counter(y).values()]
             return -sum(v * math.log2(v) for v in class_freq)
-
-

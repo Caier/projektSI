@@ -1,8 +1,8 @@
 import numpy as np
 
-from RegressionTree import RegressionTree
-import datasets.wine.prepareXY as wine
-import datasets.automobile.prepareXY as automobile
+from regression_tree.RegressionTree import RegressionTree
+from datasets.wine import prepareXY as wine
+from datasets.automobile import prepareXY as automobile
 import random
 
 for dataset in (automobile, wine):

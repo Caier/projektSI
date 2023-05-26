@@ -4,18 +4,20 @@ import numpy as np
 
 class RegressionTree:
     # Creates and trains a regression tree using X = matrix of attributes, Y = vector of values (classes)
-    def __init__(self, x, y) -> None:
+    def __init__(self, x, y, max_depth = 0xFFFFFFFF, min_sample_split = 1) -> None:
+        self.max_depth = max_depth
+        self.min_sample_split = min_sample_split
         self.x = x
         self.y = y
         self.all_attrs = [set() for _ in range(len(x[0]))]
         self.all_classes = set(y)
-        self.most_common_class = Counter(y).most_common(1)[0][0]
+        self.most_common_class = Counter(y).most_common(1)[0][0] #i don't think it makes sense to use this one
         for row in x:
             for i, a in enumerate(row):
                 if self.Node.is_discrete(x, i):
                     self.all_attrs[i].add(a)
 
-        self.tree = self.Node(self, x, y, list(range(len(x[0]))))
+        self.tree = self.Node(self, x, y, list(range(len(x[0]))), 0)
 
     def predict(self, x_row):
         node = self.tree
@@ -50,7 +52,7 @@ class RegressionTree:
     class Node:
         SubsetType = Dict[Any, Tuple[List[Any], List[List[Any]]]]  # in other words: Dict[the attribute value that data was split on, Tuple[Y values for the split, X values for the split]]
 
-        def __init__(self, tree: 'RegressionTree', x, y, attrs: List[int], value=None) -> None:
+        def __init__(self, tree: 'RegressionTree', x, y, attrs: List[int], depth: int, value=None) -> None:
             self.tree: RegressionTree = tree
             self.leaf_value = None  # the result of this node if a leaf node, None if failed node
             self.attr_value = value
@@ -66,7 +68,7 @@ class RegressionTree:
 
             if len(y) == 0:  # there are no instances having the current attribute value in the current subset
                 self.leaf_value = self.tree.most_common_class
-            elif len(y) < 4 or cvn < 0.05 or len(attrs) == 0:  # coefficient under threshold or no attributes left to decide on
+            elif len(y) < 4 or cvn < 0.05 or len(attrs) == 0 or tree.min_sample_split > len(x) or tree.max_depth <= depth:  # coefficient under threshold or no attributes left to decide on
                 self.leaf_value = sum(y)/len(y) #assigning average value
 
             else:
@@ -76,7 +78,7 @@ class RegressionTree:
                 self.leaf = False
                 self.attr = best_attr
                 self.threshold = best_threshold
-                self.children = [RegressionTree.Node(self.tree, subset[1], subset[0], rest_attrs, split_attr) for
+                self.children = [RegressionTree.Node(self.tree, subset[1], subset[0], rest_attrs, depth+1, split_attr) for
                                  split_attr, subset in splits.items()]
 
         def split(self, x, y, attrs) -> Tuple[int, float, SubsetType]:

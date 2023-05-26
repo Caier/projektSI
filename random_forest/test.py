@@ -1,4 +1,4 @@
-from random_forest import RandomForest
+from .random_forest import RandomForest
 import datasets.iris.prepareXY as iris
 import datasets.grzybki.prepareXY as grzybki
 import random
