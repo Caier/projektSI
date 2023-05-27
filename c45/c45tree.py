@@ -91,7 +91,7 @@ class C45Tree:
                     for i, row in enumerate(x):
                         subsets[row[attr]][0].append(y[i])
                         subsets[row[attr]][1].append(row)
-                    gain = self.gain_ratio(y, subsets)
+                    gain = self.goodness_function(y, subsets)
                     if gain > max_gain:
                         max_gain = gain
                         splitted = subsets
@@ -108,7 +108,7 @@ class C45Tree:
                                 which[0].append(y[ri])
                                 which[1].append(row)
                             subsets = {'<=': lesseq, '>': greater }
-                            gain = self.gain_ratio(y, subsets)
+                            gain = self.goodness_function(y, subsets)
                             if gain > max_gain:
                                 max_gain = gain
                                 splitted = subsets
@@ -125,8 +125,7 @@ class C45Tree:
                 else: return not (type(row[attr]) == int or type(row[attr]) == float)
             return True
 
-        @staticmethod
-        def gain_ratio(y, splits: SubsetType) -> float:
+        def goodness_function(self, y, splits: SubsetType) -> float: #gain ratio for C4.5
             E_before_split = C45Tree.Node.entropy(y)
             E_after_split = sum((len(split[0]) / len(y)) * C45Tree.Node.entropy(split[0]) for split in splits.values())
             split_info = 0
