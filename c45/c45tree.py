@@ -2,6 +2,7 @@ from collections import Counter
 from typing import *
 import math
 import numpy as np
+import random
 
 #example call: C45Tree(x, y, max_depth=5, min_sample_split=5)
 #the keyword arguments (hyperparameters) are not required to be set
@@ -28,7 +29,10 @@ class C45Tree:
             if node.leaf:
                 return node.leaf_value
             elif node.threshold is not None:
-                node = node.children[0 if x_row[node.attr] <= node.threshold else 1]
+                v = x_row[node.attr]
+                if v is None:
+                    v = random.random() * 2*node.threshold
+                node = node.children[0 if v <= node.threshold else 1]
                 continue
             for c in node.children:
                 if x_row[node.attr] == c.attr_value:
@@ -98,22 +102,40 @@ class C45Tree:
                         best_attr = attr
                         best_thresh = None
                 else:
-                    sort_idx = np.argsort([row[attr] for row in x])
+                    s = 0; i = 0
+                    attr_row = [row[attr] for row in x]
+                    for v in attr_row:
+                        if v is not None:
+                            s += v
+                            i += 1
+                    avg = s/i
+                    for i in range(len(attr_row)):
+                        if attr_row[i] is None:
+                            attr_row[i] = avg
+                            
+                    sort_idx = np.argsort(attr_row)
+                    def inner(i):
+                        nonlocal max_gain, splitted, best_attr, best_thresh
+                        lesseq = ([], []); greater = ([], [])
+                        threshold = (attr_row[i] + attr_row[i+1]) / 2
+                        for ri, row in enumerate(x):
+                            which = (greater if attr_row[ri] > threshold else lesseq)
+                            which[0].append(y[ri])
+                            which[1].append(row)
+                        subsets = {'<=': lesseq, '>': greater }
+                        gain = self.goodness_function(y, subsets)
+                        if gain > max_gain:
+                            max_gain = gain
+                            splitted = subsets
+                            best_attr = attr
+                            best_thresh = threshold
                     for i in range(len(sort_idx) - 1):
-                        if x[i][attr] != x[i+1][attr]:
-                            lesseq = ([], []); greater = ([], [])
-                            threshold = (x[i][attr] + x[i+1][attr]) / 2
-                            for ri, row in enumerate(x):
-                                which = (greater if row[attr] > threshold else lesseq)
-                                which[0].append(y[ri])
-                                which[1].append(row)
-                            subsets = {'<=': lesseq, '>': greater }
-                            gain = self.goodness_function(y, subsets)
-                            if gain > max_gain:
-                                max_gain = gain
-                                splitted = subsets
-                                best_attr = attr
-                                best_thresh = threshold
+                        if attr_row[i] != attr_row[i+1]:
+                            inner(i)
+                    else:
+                        inner((len(sort_idx) - 1) // 2)
+            if best_attr is None:
+                breakpoint()
 
             return (best_attr, best_thresh, splitted)
 
