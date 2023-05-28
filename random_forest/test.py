@@ -20,13 +20,15 @@ for dataset in (grzybki, iris):
     random_forest = rf(C45Tree)
     random_forest.fit(X_train, Y_train)
 
+
+    preds = random_forest.predict(X_test)
     correct = 0
-    for x, y in zip(X_test, Y_test):
-        if (v := random_forest.predict(x)) == y:
+    for i in range(len(preds)):
+        if preds[i] == Y_test[i]:
             correct += 1
 
-    print(f"{dataset.__name__}: {correct / len(Y_test)}")
 
+    print(f"{dataset.__name__}: {correct / len(Y_test)}")
 # for dataset in (automobile, wine):
 #     (X, Y) = dataset.prepareXY()
 #     train_idx = random.sample(range(len(Y)), int(0.8 * len(Y)))
