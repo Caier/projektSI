@@ -6,29 +6,30 @@ import numpy as np
 
 
 class RandomForest:
-    def __init__(self, tree_type: type(C45Tree) | type(RegressionTree), num_trees=25, min_samples_split=2, max_depth=5):
+    def __init__(self, tree_type: type(C45Tree) | type(RegressionTree), num_trees=25, max_depth=0xFFFFFFFF, min_sample_split=1):
         self.num_trees = num_trees
-        self.min_samples_split = min_samples_split
+        self.min_sample_split = min_sample_split
         self.max_depth = max_depth
         self.tree_type = tree_type
         self.decision_trees = []
 
     def sample(self, X, y):
-        xx = np.asarray(X)
-        yy = np.asarray(y)
-        n_rows = xx.shape[0]
+        n_rows = len(X)
         samples = np.random.choice(n_rows, n_rows, replace=True)
-        xxx = xx[samples]
-        yyy = yy[samples]
-        return xxx, yyy
+        x_samples = []
+        y_samples = []
+        for sample in samples:
+            x_samples.append(X[sample])
+            y_samples.append(y[sample])
+        return x_samples, y_samples
 
     def fit(self, X, y):
         self.decision_trees = []
 
         num_built = 0
         while num_built < self.num_trees:
-            _X, _y = self.sample(X, y)
-            clf = self.tree_type(_X, _y, max_depth=self.max_depth, min_sample_split=self.min_samples_split)
+            x_sample, y_sample = self.sample(X, y)
+            clf = self.tree_type(x_sample, y_sample, max_depth=self.max_depth, min_sample_split=self.min_sample_split)
             self.decision_trees.append(clf)
             num_built += 1
 
