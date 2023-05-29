@@ -1,9 +1,9 @@
 import pathlib
 
-def prepareXY():
+def prepareXY(n: int = 1000):
     with open(pathlib.Path(__file__).parent.joinpath('adult.data'), 'r') as train:
         Y = []; X = []; attrs = [{} for _ in range(14)]
-        for line in train.readlines()[:5000]:
+        for line in train.readlines()[:n]:
             data = line.strip().split(', ')
             Y.append(data[-1])
             row = data[:-1]

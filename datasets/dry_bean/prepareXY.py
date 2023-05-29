@@ -8,5 +8,5 @@ def prepareXY():
             data = line.strip().split(';')
             Y.append(data[-1])
             X.append([float(x) for x in data[:-1]])
-        idx = random.sample(range(len(Y)), 2000)
+        idx = random.sample(range(len(Y)), 500)
         return ([x for i, x in enumerate(X) if i in idx], [y for i, y in enumerate(Y) if i in idx])
