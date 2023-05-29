@@ -80,7 +80,7 @@ class RegressionTree:
                                  split_attr, subset in splits.items()]
 
         def split(self, x, y, attrs) -> Tuple[int, float, SubsetType]:
-            _, best_attr = self.standard_deviation_reduction(x, y, attrs)
+            best_attr = self.standard_deviation_reduction(x, y, attrs)
             if best_attr is None:
                 breakpoint()
             subsets: RegressionTree.Node.SubsetType = {a: ([], []) for a in self.tree.all_attrs[best_attr]}
@@ -125,7 +125,7 @@ class RegressionTree:
             else:
                 return np.inf, np.inf
 
-        def standard_deviation_reduction(self, x, y, attrs) -> Tuple[float, int]:
+        def standard_deviation_reduction(self, x, y, attrs) -> int:
             sdy, _ = self.standard_deviation(y)
             max_sdr = -np.inf
             best_attr = None
@@ -156,4 +156,4 @@ class RegressionTree:
 
 
 
-            return max_sdr, best_attr
+            return best_attr
