@@ -1,11 +1,25 @@
 import numpy as np
+import random
+
+import sys
+sys.path.append('../projektSI')  
 
 from regression_tree.RegressionTree import RegressionTree
 from datasets.wine import prepareXY as wine
 from datasets.automobile import prepareXY as automobile
-import random
+from datasets.energy import prepareXY as energy
+from datasets.machine import prepareXY as machine
+from datasets.bone_marrow import prepareXY as bone_marrow
+from datasets.slump import prepareXY as slump
 
-for dataset in (automobile, wine):
+
+
+
+
+  
+
+
+for dataset in (automobile, wine, energy, machine, bone_marrow, slump):
     (X, Y) = dataset.prepareXY()
     train_idx = random.sample(range(len(Y)), int(0.8 * len(Y)))
     X_train = [row for i, row in enumerate(X) if i in train_idx]
@@ -15,17 +29,25 @@ for dataset in (automobile, wine):
 
     rt = RegressionTree(X_train, Y_train)
 
-    SE = 0 #Standard error of regression
+    SE = 0 #standard error of regression
+    MSE = 0 #mean square error
+    MAE = 0 #mean absolute error
+   
     for x, y in zip(X_test, Y_test):
-        SE += (y - rt.predict(x))**2
-    SE  = np.sqrt(SE/len(Y_test))/np.average(Y_test)
+        prediction = rt.predict(x)
+        
+        MAE += abs(y - prediction)
+        MSE += (y - prediction)**2
+      
+    MSE /= len(Y_test)
+    MAE /= len(Y_test)
+    RMSE = np.sqrt(MSE)
 
 
-    # RSS = 0
-    # SST = 0
-    # for x, y in zip(X_test, Y_test):
-    #     RSS += (y - rt.predict(x))**2
-    #     SST += (y - np.average(Y_test))**2
-    # R2 = 1 - RSS/SST
 
-    print(f"{dataset.__name__}: {SE}")
+    print(f"{dataset.__name__}: MAE: {MAE}")
+
+   
+
+
+

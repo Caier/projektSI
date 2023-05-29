@@ -1,4 +1,3 @@
-from collections import Counter
 from typing import *
 import numpy as np
 
@@ -11,7 +10,7 @@ class RegressionTree:
         self.y = y
         self.all_attrs = [set() for _ in range(len(x[0]))]
         self.all_classes = set(y)
-        self.most_common_class = Counter(y).most_common(1)[0][0] #i don't think it makes sense to use this one
+        self.average_value = np.average(y)
         for row in x:
             for i, a in enumerate(row):
                 if self.Node.is_discrete(x, i):
@@ -32,7 +31,7 @@ class RegressionTree:
                     node = c
                     break
             else:
-                return self.most_common_class
+                return self.average_value
 
     def get_tree_logic(self) -> str:
         return self.__inner_get_tree_logic(0, self.tree)
@@ -67,10 +66,9 @@ class RegressionTree:
             _, cvn = self.standard_deviation(y)
 
             if len(y) == 0:  # there are no instances having the current attribute value in the current subset
-                self.leaf_value = self.tree.most_common_class
+                self.leaf_value = self.tree.average_value
             elif len(y) < 4 or cvn < 0.05 or len(attrs) == 0 or tree.min_sample_split > len(x) or tree.max_depth <= depth:  # coefficient under threshold or no attributes left to decide on
                 self.leaf_value = sum(y)/len(y) #assigning average value
-
             else:
                 (best_attr, best_threshold, splits) = self.split(x, y, attrs)
                 rest_attrs = attrs.copy()
@@ -135,8 +133,8 @@ class RegressionTree:
             for attr in attrs:
                     discrete = self.is_discrete(x, attr)
                     sdr = sdy
-                    for a in self.tree.all_attrs[attr]:
-                        idx = []
+                    for a in self.tree.all_attrs[attr]: 
+                        idx = [] #indices of nodes where value of a given attribute is the same (attr discrete) or within equal range (attr continuous)
 
                         if discrete:
                             for ri, row in enumerate(x):
@@ -147,6 +145,7 @@ class RegressionTree:
                             for ri, row in enumerate(x):
                                 if row[attr] > a*0.9 and row[attr] < a*1.1:
                                     idx.append(ri)
+
                         if len(idx)>0:
                             s, _ = self.standard_deviation([y[i] for i in idx])
                             sdr -= s * len(idx) / len(x) #subtract stdev * probability of value
