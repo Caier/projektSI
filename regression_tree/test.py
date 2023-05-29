@@ -1,6 +1,8 @@
 import numpy as np
 import random
 from sklearn.tree import DecisionTreeRegressor 
+import matplotlib.pyplot as plt
+
 
 import sys
 sys.path.append('../projektSI')  
@@ -25,9 +27,12 @@ for dataset in (automobile, bone_marrow, energy, machine, slump, wine):
 
     MSE = 0 #mean square error
     MAE = 0 #mean absolute error
+
+    pred = []
    
     for x, y in zip(X_test, Y_test):
         prediction = rt.predict(x)
+        pred = np.append(pred, prediction)
         
         MAE += abs(y - prediction)
         MSE += (y - prediction)**2
@@ -35,8 +40,15 @@ for dataset in (automobile, bone_marrow, energy, machine, slump, wine):
     MSE /= len(Y_test)
     MAE /= len(Y_test)
     RMSE = np.sqrt(MSE)
+    name = dataset.__name__.split(sep=".")[1]
 
-    print(f"{dataset.__name__}: MAE: {MAE} RMSE: {RMSE}")
+    # plt.plot(pred, '.', label='estimated')
+    # plt.plot(Y_test, '.', label='value')
+    # plt.legend(loc='upper right')
+    # plt.title(name)
+    # plt.show()
+
+    print(f"{name}: MAE: {MAE} RMSE: {RMSE}")
 
 
 
@@ -60,8 +72,11 @@ for dataset in (energy, slump, wine):
     cMSE = 0
     cMAE = 0 
 
+    pred = []
+
     for x, y, c in zip(X_test, Y_test, Cpredictions):
         Rprediction = rt.predict(x)
+        pred = np.append(pred, Rprediction)
               
         rMAE += abs(y - Rprediction)
         rMSE += (y - Rprediction)**2         
@@ -73,8 +88,15 @@ for dataset in (energy, slump, wine):
     rMSE /= len(Y_test)
     rMAE /= len(Y_test)
 
+    name = dataset.__name__.split(sep=".")[1]
+    # plt.plot(pred, '.', label='implemented')
+    # plt.plot(Cpredictions, '.', label='sklearn')
+    # plt.plot(Y_test, '.', label='value')
+    # plt.legend(loc='upper right')
+    # plt.title(name)
+    # plt.show()
 
-    print(f"{dataset.__name__}:\nErrors:\nMAE: {rMAE}\nRMSE: {np.sqrt(rMSE)}\nSKlearn: \nMAE: {cMAE}\nRMSE: {np.sqrt(cMSE)}")
+    print(f"{name}:\nErrors:\nMAE: {rMAE}\nRMSE: {np.sqrt(rMSE)}\nSKlearn: \nMAE: {cMAE}\nRMSE: {np.sqrt(cMSE)}")
 
 
 
