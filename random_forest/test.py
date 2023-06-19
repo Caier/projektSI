@@ -1,4 +1,4 @@
-from random_forest import RandomForest as rf
+from random_forest.random_forest import RandomForest as rf
 from c45.c45tree import C45Tree
 from regression_tree.RegressionTree import RegressionTree
 import datasets.iris.prepareXY as iris

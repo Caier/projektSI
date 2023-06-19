@@ -38,7 +38,7 @@ def plot(dataset):
                 zc45Acc += 1
             if zid3.predict(x) == y:
                 zid3Acc += 1
-        zrf = RandomForest(C45Tree, num_trees=20, max_depth=10, min_sample_split=2)
+        zrf = RandomForest(C45Tree, num_trees=10, max_depth=10, min_sample_split=2)
         zrf.fit(zX, zY)
         zrfPred = zrf.predict(zXt)
         for i in range(len(zYt)):
@@ -57,6 +57,8 @@ def plot(dataset):
     plt.title(f"Średnia dokładność każdej z metod dla zbioru {dataset[0]}")
     plt.show()
 
+#plot(("Iris", iris.prepareXY()))
+plot(("Titanic", titanic.prepareXY()))
 #plot(("Dry Beans", dry_bean.prepareXY()))
 #plot(("Adult", adult.prepareXY(500)))
-plot(("Iono", iono.prepareXY()))
+#plot(("Iono", iono.prepareXY()))
